@@ -1,15 +1,3 @@
-// Your code here
-
-//get weather, form and button elements
-//attach fetch call to the button element click
-//use https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={currentWeather}
-//map needs to be based on location
-// "https://api.openweathermap.org/data/2.5/weather?q=London&appid=8907802964041b9d0da4e362e4a9789c"
-//input should display not found if location not found.
-//render map with (city name h2) (an (a) hyperlink href google map link) (img icon of weather conditions) (
-    //p text of current, feels like, and last updated conditions, )
-    //append to page.
-//create .catch function (err) to catch errors.
 
 var userQuery = document.getElementById("weather-search")
 var btn = document.querySelector("button")
@@ -27,18 +15,24 @@ form.onsubmit = function(e) {
     const APIKey = "8907802964041b9d0da4e362e4a9789c";
     console.log (URL,userQuery,APIKey)
     fetch(URL + userQuery + "&appid=" + APIKey)
-
+     
 .then (function(res) {
+    if (res.status !== 200) {
+        //weatherDiv.innerHTML = ""
+        form.search.value = ""
+    throw new Error('Location not found')
+    }
     return res.json()
-    console.log("res here")
-    console.log("res",res)
+    
 })
     .then(function(data) {
         weatherDiv.innerHTML = ""
         form.search.value = ""
         
+            //API web Data
         console.log("laterudata",data)
         console.log("main",data.main)
+        console.log(data.sys.country)
         console.log("main",data.main.feels_like)
         console.log("main",data.main.temp)
         console.log("weather",data.weather)
@@ -46,7 +40,7 @@ form.onsubmit = function(e) {
         console.log("weather",data.weather[0])
         console.log("weather",data.weather[0].main)
         console.log("weather",data.weather[0].icon)
-        console.log(data.sys.country)
+        console.log("laterudata",data.dt * 1000)
 
         console.log(weather)
 
@@ -57,11 +51,10 @@ form.onsubmit = function(e) {
         var aTag = document.createElement('a');
         aTag.setAttribute('href', "https://www.google.com/maps/search/?api=1&query=" + data.coord.lat + "," + data.coord.lon)
         aTag.textContent = "click to view map";
-        //window.open(aTag, "_blank")
         weatherDiv.appendChild(aTag);
 
         var img = document.createElement('img')
-       //img.src = "https://openweathermap.org/img/wn/10d@2x.png"
+            //img.src = "https://openweathermap.org/img/wn/10d@2x.png"
         img.src = "https://openweathermap.org/img/wn/" + data.weather[0].icon + "@2x.png"
         console.log("image",img)
         weatherDiv.appendChild(img);
@@ -70,22 +63,32 @@ form.onsubmit = function(e) {
         weatherMain.textContent = data.weather[0].description.toUpperCase()
         weatherDiv.appendChild(weatherMain)
         
+        weatherDiv.appendChild(document.createElement('br'))
         var temp = document.createElement('p')
-        temp.textContent = ("Current:  " + data.main.temp + "°")
+        temp.textContent = ("Current:  " + data.main.temp + " " + "°F")
         weatherDiv.appendChild(temp)
         
         var temp2 = document.createElement("p")
-        temp2.textContent = ("Feels like: "  + data.main.feels_like + "°")
+        temp2.textContent = ("Feels like:  "  + data.main.feels_like + " " + "°F")
         weatherDiv.appendChild(temp2)
 
+        weatherDiv.appendChild(document.createElement('br'))  
+        var time = document.createElement('p') 
+        var date = new Date(data.dt * 1000)
+        console.log('date', date,) 
+        var timeString = date.toLocaleTimeString('en-US', {
+           hour: 'numeric',
+         minute: '2-digit'
+        })
+        time.textContent = ("Last updated  " + timeString)
+        weatherDiv.appendChild(time)
+        console.log('timestring', time.timeString)       
+
+    })
+
+    .catch(function(err) {
+        weatherDiv.innerHTML = err.message  
         
-
-
-    
-
-       
-        
-
     })
 
 }
